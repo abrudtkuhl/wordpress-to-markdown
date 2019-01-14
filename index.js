@@ -167,7 +167,7 @@ function wordpressImport(backupXmlFile, outputDir){
                         markdown = tds.turndown(content);
                         // console.log(markdown);
 
-                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: false\n${tagString}---\n`;
+                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: false\n${tagString}\nextends: _layouts.post\nsection: content\n---`;
                         fileContent = `${fileHeader}\n${markdown}`;
                         pmap.header = `${fileHeader}\n`;
 
@@ -225,6 +225,65 @@ function wordpressImport(backupXmlFile, outputDir){
         });
     });
 
+}
+
+function writeComments(postMaps){
+
+    if (mergeComments == 'm'){
+        console.log('DEBUG: merge comments requested');
+    }else{
+        console.log('DEBUG: separate comments requested (defaulted)');
+    }
+    for (var pmap in postMaps){
+        var comments = postMaps[pmap].comments;
+        console.log(`post id: ${pmap} has ${comments.length} comments`);
+        // console.dir(comments);
+
+        if (comments.length){
+            var ccontent = '';
+            comments.forEach(function(comment){
+                var readableDate = '<time datetime="'+comment.published+'">' + moment(comment.published).format("MMM d, YYYY") + '</time>';
+
+                ccontent += `#### ${comment.title}\n[${comment.author.name}](${comment.author.url} "${comment.author.email}") - ${readableDate}\n\n${comment.content}\n<hr />\n`;
+            });
+
+            if (mergeComments == 'm'){
+                writeToFile(postMaps[pmap].postName, `\n---\n### Comments:\n${ccontent}`, true);
+            }else{
+                writeToFile(postMaps[pmap].fname, `${postMaps[pmap].header}\n${ccontent}`);
+            }
+            
+        }
+    }
+}
+
+
+
+function writeToFile(filename, content, append=false){
+
+    if(append){
+        console.log(`DEBUG: going to append to ${filename}`);
+        try{
+            fs.appendFileSync(filename, content);
+            console.log(`Successfully appended to ${filename}`);
+        }
+        catch(err){
+            console.log(`Error while appending to ${filename} - ${JSON.stringify(err)}`);
+            console.dir(err);
+        }
+
+    }else{
+        console.log(`DEBUG: going to write to ${filename}`);
+        try{
+            fs.writeFileSync(filename, content);
+            console.log(`Successfully written to ${filename}`);
+        }
+        catch(err){
+            console.log(`Error while writing to ${filename} - ${JSON.stringify(err)}`);
+            console.dir(err);
+        }
+    }
+    
 }
 
 function pad(numb) {
