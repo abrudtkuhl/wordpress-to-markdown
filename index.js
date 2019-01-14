@@ -226,3 +226,7 @@ function wordpressImport(backupXmlFile, outputDir){
     });
 
 }
+
+function pad(numb) {
+    return (numb < 10 ? '0' : '') + numb;
+}
