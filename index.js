@@ -119,7 +119,9 @@ function wordpressImport(backupXmlFile, outputDir){
                     title = title.replace(/'/g, "''");
                     // }
 
-                    published = post.pubDate;
+                    var date = new Date(post.pubDate);
+                    published = pad(date.getFullYear()) + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+                    
                     comments = post['wp:comment'];
                     fname = post["wp:post_name"];
                     markdown = '';
