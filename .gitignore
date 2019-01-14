@@ -2,7 +2,7 @@
 *wordpress*.xml
 out
 in
-
+.DS_Store
 
 
 # https://github.com/github/gitignore/blob/master/Node.gitignore
